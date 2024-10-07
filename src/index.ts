@@ -1,11 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { Elysia } from "elysia";
 import { apiRoutes } from "./routes/api";
+import { wsRoutes } from "./routes/ws";
 
 export const prisma = new PrismaClient();
 const app = new Elysia()
     .get("/", () => Bun.file("src/index.html"))
     .use(apiRoutes)
+    .use(wsRoutes)
     .listen(3000);
 
 async function main() {

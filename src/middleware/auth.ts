@@ -115,38 +115,45 @@ export const chatpadJwt = new Elysia()
  */
 export const isAuthenticated = new Elysia()
     .use(chatpadJwt)
-    .derive(async ({ jwtAccess, set, cookie: { jwtAccessCookie } }) => {
-        // todo: gotos the best option? lmao
-        goodPath: {
-            const token = jwtAccessCookie.value;
-            // if no access cookie
-            if (!token) break goodPath;
+    .derive(
+        { as: "scoped" },
+        async ({ jwtAccess, set, error, cookie: { jwtAccessCookie } }) => {
+            // todo: gotos the best option? lmao
+            goodPath: {
+                const token = jwtAccessCookie.value;
+                // if no access cookie
+                if (!token) {
+                    return error("Unauthorized", {
+                        success: false,
+                        message: "Unauthorized",
+                    });
+                }
 
-            const payload = await jwtAccess.verify(token);
-            // if not a valid jwt cookie
-            if (!payload) break goodPath;
+                const payload = await jwtAccess.verify(token);
+                // if not a valid jwt cookie
+                if (!payload) break goodPath;
 
-            // make sure refresh token can't be passed off as access token (redundant?)
-            if (payload?.tokenType !== "access") break goodPath;
+                // make sure refresh token can't be passed off as access token (redundant?)
+                if (payload?.tokenType !== "access") break goodPath;
 
-            const sub = payload.sub as string;
-            const user = await prisma.user.findUnique({
-                where: { id: sub },
-            });
+                const sub = payload.sub as string;
+                const user = await prisma.user.findUnique({
+                    where: { id: sub },
+                });
 
-            // if no user found with id
-            if (!user) break goodPath;
+                // if no user found with id
+                if (!user) break goodPath;
 
-            return {
-                user,
-            };
+                return {
+                    user,
+                };
+            }
+
+            // "bad" path
+
+            return error("Forbidden", { success: false, message: "Forbidden" });
         }
-
-        // "bad" path
-
-        set.status = 401;
-        return { success: false, message: "Unauthorized" };
-    });
+    );
 
 /**
  * An auth middleware that adds the user to the context if they are logged in, but otherwise null.
