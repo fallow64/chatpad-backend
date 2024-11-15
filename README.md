@@ -1,15 +1,16 @@
-# Elysia with Bun runtime
+# Chatpad Backend
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
-```
+The backend server for Chatpad. The general features include authentication and
+a channel-based messaging system. Some features may not be complete yet.
 
-## Development
-To start the development server run:
-```bash
-bun run dev
-```
+## Run
 
-Open http://localhost:3000/ with your browser to see the result.
+Install the dependencies with `npm i`, and run with `npm run dev`.
+
+## Environment Variables
+
+`JWT_ACCESS_SECRET`: JWT Access Secret Key
+
+`JWT_REFRESH_SECRET`: JWT Refresh Secret Key
+
+`PORT`: The port to run the server

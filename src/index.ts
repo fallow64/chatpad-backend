@@ -2,13 +2,16 @@ import { PrismaClient } from "@prisma/client";
 import { Elysia } from "elysia";
 import { apiRoutes } from "./routes/api";
 import { wsRoutes } from "./routes/ws";
+import cors from "@elysiajs/cors";
 
 export const prisma = new PrismaClient();
 const app = new Elysia()
-    .get("/", () => Bun.file("src/index.html"))
     .use(apiRoutes)
     .use(wsRoutes)
-    .listen(3000);
+    .use(cors({
+        origin: "http://localhost:3000"
+    }))
+    .listen(process.env.PORT ?? 3000);
 
 async function main() {
     console.log(
